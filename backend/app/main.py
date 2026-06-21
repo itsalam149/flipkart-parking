@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from .api import hotspots, stream
-from .cv.camera_node import camera_node
+from .cv.camera_node import camera_manager
 
 app = FastAPI(title="ParkOptima AI Engine", version="1.0.0")
 
@@ -17,12 +17,12 @@ app.add_middleware(
 # Start the background CV pipeline thread when FastAPI starts
 @app.on_event("startup")
 def startup_event():
-    print("Starting background CV thread...")
-    camera_node.start()
+    print("Starting background CV threads...")
+    camera_manager.start_all()
 
 @app.on_event("shutdown")
 def shutdown_event():
-    camera_node.stop()
+    camera_manager.stop_all()
 
 @app.get("/")
 def read_root():

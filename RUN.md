@@ -1,61 +1,44 @@
 # ⚙️ How to Run ParkOptima AI
 
-To launch the complete ParkOptima AI system locally, you need to run both the FastAPI Edge Backend (which handles the Computer Vision and Database sync) and the Next.js Frontend (which serves the dashboard UI).
+We have unified the boot process! You no longer need to open separate terminals.
 
-Follow these steps exactly. Open **two separate terminal windows**.
+## 1. Setup Environment
+First, ensure you have set up your Supabase database.
+Copy `example.env` to `backend/.env` and fill in your Supabase credentials:
+```bash
+NEXT_PUBLIC_SUPABASE_URL=...
+NEXT_PUBLIC_SUPABASE_ANON_KEY=...
+SUPABASE_SERVICE_ROLE_KEY=...
+```
 
----
+## 2. Install Dependencies
+If this is your first time, install the frontend dependencies.
+```bash
+cd frontend
+npm install
+```
 
-## 1. Start the Backend (Terminal 1)
+Make sure your backend Python virtual environment is set up and requirements installed:
+```bash
+cd backend
+python -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
+```
 
-The backend runs the YOLOv8 AI pipeline, connects to the Supabase database, and streams the MJPEG video feed to the frontend.
+## 3. Run the Entire System
+We use `concurrently` to run both the FastAPI Backend (Computer Vision & Database logic) and the Next.js Frontend (Command Center UI) with a single command!
 
-1. Navigate to the backend directory:
-   ```bash
-   cd backend
-   ```
-2. Activate the Python Virtual Environment:
-   ```bash
-   # On Mac/Linux:
-   source venv/bin/activate
-   
-   # On Windows:
-   .\venv\Scripts\activate
-   ```
-3. Start the FastAPI server:
-   ```bash
-   uvicorn app.main:app --reload
-   ```
-   *You should see a message saying "Starting background CV thread..." and "Uvicorn running on http://127.0.0.1:8000".*
+Open a terminal and run:
+```bash
+cd frontend
+npm run dev
+```
 
----
+That's it! Both servers will start simultaneously.
 
-## 2. Start the Frontend (Terminal 2)
-
-The frontend is the glassmorphic Command Center UI that the judges will interact with.
-
-1. Navigate to the frontend directory:
-   ```bash
-   cd frontend
-   ```
-2. Install dependencies (if this is your first time):
-   ```bash
-   npm install
-   ```
-3. Start the Next.js Development Server:
-   ```bash
-   npm run dev
-   ```
-   *The server will boot up on http://localhost:3000.*
-
----
-
-## 3. Presenting the Demo
-
-Once both servers are running:
+## 4. View the Dashboard
 1. Open your browser and navigate to **`http://localhost:3000`**.
-2. **The Live Camera HUD** in the bottom right corner will automatically connect to the Backend's MJPEG stream and begin rendering the YOLOv8 detections.
-3. Every 2 seconds, the backend will push the latest `illegal_cars_count` and `UMIS Score` to Supabase.
-4. The Next.js frontend will automatically fetch this data, and you will see the **Dispatch Panel** and **Digital Twin Map** updating dynamically based on the live camera feed!
-
-> **Troubleshooting Tip:** If the video stream doesn't load immediately, ensure your `backend` terminal is active and no errors were thrown regarding missing OpenCV libraries. The YOLOv8 model (`yolov8n.pt`) and sample video (`sample_traffic.mp4`) are already included in the backend folder.
+2. The Live Camera HUD in the bottom right corner will connect to the MJPEG stream.
+3. Use the **CAM 1 / CAM 2 / CAM 3** toggles on the HUD to shift between simulated camera angles.
+4. The system automatically pushes live violation data to Supabase, updating the Digital Twin Map and UMIS charts dynamically!
